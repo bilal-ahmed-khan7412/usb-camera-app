@@ -10,18 +10,14 @@ function App() {
         const videoInputs = devices.filter(d => d.kind === "videoinput");
 
         // Take up to 4 cameras
-videoInputs.slice(0, 4).forEach(async (device, i) => {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: { deviceId: { exact: device.deviceId } }
-    });
-    if (videoRefs[i].current) {
-      videoRefs[i].current.srcObject = stream;
-    }
-  } catch (err) {
-    console.error(`Camera ${i + 1} failed:`, err);
-  }
-});
+        videoInputs.slice(0, 4).forEach(async (device, i) => {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: { deviceId: device.deviceId }
+          });
+          if (videoRefs[i].current) {
+            videoRefs[i].current.srcObject = stream;
+          }
+        });
       } catch (err) {
         console.error("Error accessing cameras:", err);
       }
