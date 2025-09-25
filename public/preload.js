@@ -1,4 +1,5 @@
-// Optional: safe bridge between Node & browser
-window.addEventListener('DOMContentLoaded', () => {
-  console.log("Preload script loaded");
+const { contextBridge, ipcRenderer } = require("electron");
+
+contextBridge.exposeInMainWorld("electronAPI", {
+  saveImages: (images) => ipcRenderer.send("save-images", images)
 });
