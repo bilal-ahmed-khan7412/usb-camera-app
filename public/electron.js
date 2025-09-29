@@ -1,3 +1,4 @@
+// app.js
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const fs = require("fs");
@@ -14,18 +15,19 @@ function createWindow() {
   });
 
   if (isDev) {
-    // Dev mode → React dev server
     win.loadURL(process.env.ELECTRON_START_URL);
   } else {
-    // Prod mode → Load built React index.html
     win.loadFile(path.join(__dirname, "../build/index.html"));
   }
 }
 
-// 📸 IPC handler to save multiple images
-ipcMain.handle("save-images", async (event, images) => {
+// IPC handler
+ipcMain.handle("save-images", async (event, { images, category }) => {
   try {
-    const saveDir = path.join(app.getPath("pictures"), "USBCameraApp");
+    // Strip trailing digits (e.g. corolla1 → corolla)
+    const folderName = category.replace(/[0-9]+$/, "").toLowerCase();
+
+    const saveDir = path.join(app.getPath("pictures"), folderName);
 
     if (!fs.existsSync(saveDir)) {
       fs.mkdirSync(saveDir, { recursive: true });
@@ -34,9 +36,8 @@ ipcMain.handle("save-images", async (event, images) => {
     const savedPaths = [];
 
     images.forEach((dataUrl, index) => {
-      // strip "data:image/png;base64,"
       const base64Data = dataUrl.replace(/^data:image\/png;base64,/, "");
-      const filename = `camera${index + 1}_${Date.now()}.png`;
+      const filename = `${folderName}_${Date.now()}_${index + 1}.png`;
       const filePath = path.join(saveDir, filename);
 
       fs.writeFileSync(filePath, Buffer.from(base64Data, "base64"));
