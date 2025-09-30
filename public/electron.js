@@ -22,10 +22,24 @@ function createWindow() {
 }
 
 // IPC handler
+// IPC handler
 ipcMain.handle("save-images", async (event, { images, category }) => {
   try {
-    // Strip trailing digits (e.g. corolla1 → corolla)
-    const folderName = category.replace(/[0-9]+$/, "").toLowerCase();
+    // Decide folder based on prefix regex
+    let folderName = "cross"; // default
+
+    if (/^ZRE/i.test(category)) {
+      // could be Corolla or Fortuner
+      folderName = "corolla"; // ✅ choose Corolla
+      // if you want to distinguish Corolla vs Fortuner separately, 
+      // you’d need an extra condition (see note below)
+    } else if (/^NSP/i.test(category)) {
+      folderName = "yaris";
+    } else if (/^GUN/i.test(category)) {
+      folderName = "revo";
+    } else {
+      folderName = "cross"; // fallback
+    }
 
     const saveDir = path.join(app.getPath("pictures"), folderName);
 
@@ -50,6 +64,7 @@ ipcMain.handle("save-images", async (event, { images, category }) => {
     throw err;
   }
 });
+
 
 app.whenReady().then(createWindow);
 
