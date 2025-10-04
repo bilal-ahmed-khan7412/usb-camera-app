@@ -21,7 +21,7 @@ function createWindow() {
   }
 }
 
-// IPC handler
+// IPC handler checker com
 // IPC handler
 ipcMain.handle("save-images", async (event, { images, category }) => {
   try {
